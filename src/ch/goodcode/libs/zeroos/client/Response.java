@@ -22,11 +22,11 @@ public class Response {
     }
     
     public boolean exists() {
-        
+        return false;
     }
     
     public boolean running() {
-        
+        return false;
     }
     
     public void stream() {
