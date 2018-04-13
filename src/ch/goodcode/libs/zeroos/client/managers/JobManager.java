@@ -5,6 +5,7 @@
  */
 package ch.goodcode.libs.zeroos.client.managers;
 
+import ch.goodcode.libs.logging.LogBuffer;
 import redis.clients.jedis.Jedis;
 
 /**
@@ -12,9 +13,10 @@ import redis.clients.jedis.Jedis;
  * @author Paolo Domenighetti
  */
 public class JobManager extends AbstractJedisWrap {
-    
-    public JobManager(Jedis jedis) {
-        super(jedis);
+
+    public JobManager(LogBuffer log, Jedis jedis) {
+        super(log, jedis);
     }
+    
     
 }

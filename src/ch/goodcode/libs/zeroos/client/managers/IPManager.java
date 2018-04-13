@@ -5,6 +5,7 @@
  */
 package ch.goodcode.libs.zeroos.client.managers;
 
+import ch.goodcode.libs.logging.LogBuffer;
 import redis.clients.jedis.Jedis;
 
 /**
@@ -19,12 +20,12 @@ public class IPManager extends AbstractJedisWrap {
     public final IPAddrManager addr;
     public final IPRouteManager route;
     
-    public IPManager(Jedis jedis) {
-        super(jedis);
-        bridge = new IPBridgeManager(jedis);
-        link = new IPLinkManager(jedis);
-        addr = new IPAddrManager(jedis);
-        route = new IPRouteManager(jedis);
+    public IPManager(LogBuffer log, Jedis jedis) {
+        super(log, jedis);
+        bridge = new IPBridgeManager(log, jedis);
+        link = new IPLinkManager(log, jedis);
+        addr = new IPAddrManager(log, jedis);
+        route = new IPRouteManager(log, jedis);
     }
     
 }

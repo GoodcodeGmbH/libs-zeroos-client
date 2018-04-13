@@ -5,6 +5,9 @@
  */
 package ch.goodcode.libs.zeroos.client;
 
+import ch.goodcode.libs.logging.LogBuffer;
+import ch.goodcode.libs.utils.dataspecs.EJSONArray;
+import ch.goodcode.libs.utils.dataspecs.EJSONObject;
 import ch.goodcode.libs.zeroos.client.managers.AggregatorManager;
 import ch.goodcode.libs.zeroos.client.managers.BridgeManager;
 import ch.goodcode.libs.zeroos.client.managers.BtrfsManager;
@@ -12,15 +15,15 @@ import ch.goodcode.libs.zeroos.client.managers.ContainerManager;
 import ch.goodcode.libs.zeroos.client.managers.DiskManager;
 import ch.goodcode.libs.zeroos.client.managers.KvmManager;
 import ch.goodcode.libs.zeroos.client.managers.ZerotierManager;
-import redis.clients.jedis.Jedis;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *
  * @author Paolo Domenighetti
  */
-public class ZeroOSClient {
+public final class ZeroOSClient extends BaseClient {
     
-    private final Jedis jedis;
     
     public final Nft nft = new Nft();
     public final Config config = new Config();
@@ -33,19 +36,16 @@ public class ZeroOSClient {
     public final KvmManager kvm;
     public final AggregatorManager aggregator;
 
-    /**
-     * 
-     * @param nodeIpInZeroTierNetwork 
-     */
-    public ZeroOSClient(String nodeIpInZeroTierNetwork) { // <Zero-os node IP address in the ZeroTier network>
-        this.jedis = new Jedis(nodeIpInZeroTierNetwork); // TODO better
-        container = new ContainerManager(jedis);
-        bridge = new BridgeManager(jedis);
-        disk = new DiskManager(jedis);
-        btrfs = new BtrfsManager(jedis);
-        zerotier = new ZerotierManager(jedis);
-        kvm = new KvmManager(jedis);
-        aggregator = new AggregatorManager(jedis);
+
+    public ZeroOSClient(LogBuffer log, String zeroTierHost, String password) { 
+        super(log, 0L);
+        container = new ContainerManager(log, jedis);
+        bridge = new BridgeManager(log, jedis);
+        disk = new DiskManager(log, jedis);
+        btrfs = new BtrfsManager(log, jedis);
+        zerotier = new ZerotierManager(log, jedis);
+        kvm = new KvmManager(log, jedis);
+        aggregator = new AggregatorManager(log, jedis);
     }
 
 //    /**
@@ -56,12 +56,59 @@ public class ZeroOSClient {
 //    }
     
     
-    public void raw() {
+    /**
+     *  Implements the low level command call, this needs to build the command structure
+        and push it on the correct queue.
+        :param command: Command name to execute supported by the node (ex: core.system, info.cpu, etc...)
+                        check documentation for list of built in commands
+        :param arguments: A dict of required command arguments depends on the command name.
+        :param queue: command queue (commands on the same queue are executed sequentially)
+        :param max_time: kill job server side if it exceeded this amount of seconds
+        :param stream: If True, process stdout and stderr are pushed to a special queue (stream:<id>) so
+            client can stream output
+        :param tags: job tags
+        :param id: job id. Generated if not supplied
+        :return: Response object
+     */
+    @Override
+    public Response raw(String command, HashMap<String,String> arguments, String queue, boolean stream, long max_time, String id, String... tags) {
+        if(id == null) {
+            id = "TODO generate";
+        }
         
+        EJSONObject payload = new EJSONObject();
+        payload.putString("id", id);
+        payload.putString("queue", queue);
+        payload.putLong("max_time", max_time);
+        payload.putBoolean("stream", stream);
+        
+        EJSONArray tagsa = new EJSONArray();
+        for (String tag : tags) {
+            tagsa.addString(tag);
+        }
+        payload.putArray("tags", tagsa);
+        
+        EJSONObject args = new EJSONObject();
+        for (Map.Entry<String, String> entry : arguments.entrySet()) {
+            String key = entry.getKey();
+            String value = entry.getValue();
+            args.putString(key, value);
+        }
+        payload.putObject("arguments", args);
+        
+        String flag = "result:"+id+":flag";
+        jedis.rpush("core:default", payload.toJSONString());
+        
+        String brpoplpush = jedis.brpoplpush(flag, flag, 10);
+        if(brpoplpush == null || brpoplpush.equals("")) {
+            // TODO log timeout in submit
+            return null;
+        }
+        
+        Response r = new Response(jedis, id);
+        return r;
     }
     
-    public void responseFor() {
-        
-    }
+    
     
 }

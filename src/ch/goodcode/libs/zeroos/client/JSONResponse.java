@@ -5,11 +5,17 @@
  */
 package ch.goodcode.libs.zeroos.client;
 
+import redis.clients.jedis.Jedis;
+
 /**
  *
  * @author Paolo Domenighetti
  */
 public class JSONResponse extends Response {
+
+    public JSONResponse(Jedis jedis, String id) {
+        super(jedis, id);
+    }
 
     @Override
     public void get() {

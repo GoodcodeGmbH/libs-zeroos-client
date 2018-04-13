@@ -5,6 +5,7 @@
  */
 package ch.goodcode.libs.zeroos.client.managers;
 
+import ch.goodcode.libs.logging.LogBuffer;
 import redis.clients.jedis.Jedis;
 
 /**
@@ -12,10 +13,12 @@ import redis.clients.jedis.Jedis;
  * @author Paolo Domenighetti
  */
 public class AggregatorManager extends AbstractJedisWrap {
-    
-    public AggregatorManager(Jedis jedis) {
-        super(jedis);
+
+    public AggregatorManager(LogBuffer log, Jedis jedis) {
+        super(log, jedis);
     }
+    
+    
     
     /**
      * 

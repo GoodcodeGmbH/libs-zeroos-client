@@ -5,6 +5,7 @@
  */
 package ch.goodcode.libs.zeroos.client.managers;
 
+import ch.goodcode.libs.logging.LogBuffer;
 import redis.clients.jedis.Jedis;
 
 /**
@@ -13,10 +14,14 @@ import redis.clients.jedis.Jedis;
  */
 public abstract class AbstractJedisWrap {
     
+    protected final LogBuffer log;
     protected final Jedis jedis;
 
-    protected AbstractJedisWrap(Jedis jedis) {
+    public AbstractJedisWrap(LogBuffer log, Jedis jedis) {
+        this.log = log;
         this.jedis = jedis;
     }
+
+    
     
 }
