@@ -6,104 +6,99 @@
 package ch.goodcode.libs.zeroos.client;
 
 import ch.goodcode.libs.logging.LogBuffer;
-import ch.goodcode.libs.utils.dataspecs.EJSONArray;
-import ch.goodcode.libs.utils.dataspecs.EJSONObject;
-import ch.goodcode.libs.zeroos.client.managers.AggregatorManager;
-import ch.goodcode.libs.zeroos.client.managers.BridgeManager;
-import ch.goodcode.libs.zeroos.client.managers.BtrfsManager;
-import ch.goodcode.libs.zeroos.client.managers.ContainerManager;
-import ch.goodcode.libs.zeroos.client.managers.DiskManager;
-import ch.goodcode.libs.zeroos.client.managers.KvmManager;
-import ch.goodcode.libs.zeroos.client.managers.ZerotierManager;
-import java.util.HashMap;
-import java.util.Map;
+import org.python.core.PyInteger;
+import org.python.core.PyObject;
+import org.python.util.PythonInterpreter;
 
 /**
  *
  * @author Paolo Domenighetti
  */
-public final class ZeroOSClient extends BaseClient {
+public final class ZeroOSClient {
 
-    public final Nft nft = new Nft();
-    public final Config config = new Config();
+    private final PythonInterpreter PYTHON = new PythonInterpreter();
+    private final String zeroCoreHostAddr;
+    private final String password;
+    private final LogBuffer LOG;
 
-    public final ContainerManager container;
-    public final BridgeManager bridge;
-    public final DiskManager disk;
-    public final BtrfsManager btrfs;
-    public final ZerotierManager zerotier;
-    public final KvmManager kvm;
-    public final AggregatorManager aggregator;
-
-    public ZeroOSClient(LogBuffer log, String zeroTierHost, String password) {
-        super(log, 0L);
-        container = new ContainerManager(log, jedis);
-        bridge = new BridgeManager(log, jedis);
-        disk = new DiskManager(log, jedis);
-        btrfs = new BtrfsManager(log, jedis);
-        zerotier = new ZerotierManager(log, jedis);
-        kvm = new KvmManager(log, jedis);
-        aggregator = new AggregatorManager(log, jedis);
+    public ZeroOSClient(LogBuffer log, String zeroCoreHostAddr, String password) {
+        this.zeroCoreHostAddr = zeroCoreHostAddr;
+        this.password = password;
+        this.LOG = log;
     }
 
-//    /**
-//     * @param args the command line arguments
-//     */
-//    public static void main(String[] args) {
-//        // TODO code application logic here
-//    }
+    public void start() {
+        PYTHON.exec("from zeroos.core0.client import Client");
+        PYTHON.exec("cl = Client(host='" + zeroCoreHostAddr + "', password='" + password + "')");
+    }
+
+    private String process(String appendedPythonExecCommand) {
+        PYTHON.exec("x = cl." + appendedPythonExecCommand);
+        PyObject x = PYTHON.get("x");
+        return x.asString();
+    }
+
+    public void stop() {
+
+    }
+
+    // ====================================================================================================================
+    // ====================================================================================================================
+    // Client Managers Wrap APIs
+    
     /**
-     * Implements the low level command call, this needs to build the command
-     * structure and push it on the correct queue. :param command: Command name
-     * to execute supported by the node (ex: core.system, info.cpu, etc...)
-     * check documentation for list of built in commands :param arguments: A
-     * dict of required command arguments depends on the command name. :param
-     * queue: command queue (commands on the same queue are executed
-     * sequentially) :param max_time: kill job server side if it exceeded this
-     * amount of seconds :param stream: If True, process stdout and stderr are
-     * pushed to a special queue (stream:<id>) so client can stream output
-     * :param tags: job tags :param id: job id. Generated if not supplied
-     * :return: Response object
+     *
+     * @param arg
+     * @return
      */
-    @Override
-    public Response raw(String command, HashMap<String, String> arguments, String queue, boolean stream, long max_time, String id, String... tags) {
-        if (id == null) {
-            id = "TODO generate";
-        }
-
-        EJSONObject payload = new EJSONObject();
-        payload.putString("id", id);
-        payload.putString("queue", queue);
-        payload.putLong("max_time", max_time);
-        payload.putBoolean("stream", stream);
-
-        EJSONArray tagsa = new EJSONArray();
-        for (String tag : tags) {
-            tagsa.addString(tag);
-        }
-        payload.putArray("tags", tagsa);
-
-        EJSONObject args = new EJSONObject();
-        if (arguments != null) {
-            for (Map.Entry<String, String> entry : arguments.entrySet()) {
-                String key = entry.getKey();
-                String value = entry.getValue();
-                args.putString(key, value);
-            }
-        }
-        payload.putObject("arguments", args);
-
-        String flag = "result:" + id + ":flag";
-        jedis.rpush("core:default", payload.toJSONString());
-
-        String brpoplpush = jedis.brpoplpush(flag, flag, 10);
-        if (brpoplpush == null || brpoplpush.equals("")) {
-            // TODO log timeout in submit
-            return null;
-        }
-
-        Response r = new Response(jedis, id);
-        return r;
+    public String system(String arg) {
+        return process("system('" + arg + "').get()");
     }
 
+    /**
+     *
+     * @param action
+     * @return
+     */
+    public String disk(String action) {
+        return process("disk." + action + "()");
+    }
+
+
+    // ====================================================================================================================
+    // ====================================================================================================================
+    // Client methods Wrap APIs
+    
+//    public String bash(String action) {
+//        return process("disk." + action + "()");
+//    }
+//
+//    public String subscribe(String action) {
+//        return process("disk." + action + "()");
+//    }
+
+    // ====================================================================================================================
+    // ====================================================================================================================
+    public static void main(String[] args) {
+        //test1();
+    }
+
+    private static void test1() {
+        PythonInterpreter interp = new PythonInterpreter();
+        interp.exec("import sys");
+        interp.exec("print sys");
+        interp.set("a", new PyInteger(42));
+        interp.exec("print a");
+        interp.exec("x = 2+2");
+        PyObject x = interp.get("x");
+        System.out.println("x: " + x);
+    }
+
+    private static void test2() {
+        LogBuffer log = new LogBuffer("test-log", "C:\\temp", 0, 99);
+        ZeroOSClient o = new ZeroOSClient(log, "", "");
+        o.start();
+
+        o.stop();
+    }
 }
