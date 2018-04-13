@@ -12,7 +12,7 @@ import redis.clients.jedis.Jedis;
  *
  * @author Paolo Domenighetti
  */
-public class KvmManager extends AbstractJedisWrap {
+public class KvmManager extends AbstractClientWrap {
 
     public KvmManager(LogBuffer log, Jedis jedis) {
         super(log, jedis);

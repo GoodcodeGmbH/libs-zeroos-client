@@ -12,7 +12,7 @@ import redis.clients.jedis.Jedis;
  *
  * @author Paolo Domenighetti
  */
-public class FilsesystemManager extends AbstractJedisWrap {
+public class FilsesystemManager extends AbstractClientWrap {
 
     public FilsesystemManager(LogBuffer log, Jedis jedis) {
         super(log, jedis);

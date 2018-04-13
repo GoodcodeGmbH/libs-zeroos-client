@@ -23,11 +23,10 @@ import java.util.Map;
  * @author Paolo Domenighetti
  */
 public final class ZeroOSClient extends BaseClient {
-    
-    
+
     public final Nft nft = new Nft();
     public final Config config = new Config();
-    
+
     public final ContainerManager container;
     public final BridgeManager bridge;
     public final DiskManager disk;
@@ -36,8 +35,7 @@ public final class ZeroOSClient extends BaseClient {
     public final KvmManager kvm;
     public final AggregatorManager aggregator;
 
-
-    public ZeroOSClient(LogBuffer log, String zeroTierHost, String password) { 
+    public ZeroOSClient(LogBuffer log, String zeroTierHost, String password) {
         super(log, 0L);
         container = new ContainerManager(log, jedis);
         bridge = new BridgeManager(log, jedis);
@@ -54,61 +52,58 @@ public final class ZeroOSClient extends BaseClient {
 //    public static void main(String[] args) {
 //        // TODO code application logic here
 //    }
-    
-    
     /**
-     *  Implements the low level command call, this needs to build the command structure
-        and push it on the correct queue.
-        :param command: Command name to execute supported by the node (ex: core.system, info.cpu, etc...)
-                        check documentation for list of built in commands
-        :param arguments: A dict of required command arguments depends on the command name.
-        :param queue: command queue (commands on the same queue are executed sequentially)
-        :param max_time: kill job server side if it exceeded this amount of seconds
-        :param stream: If True, process stdout and stderr are pushed to a special queue (stream:<id>) so
-            client can stream output
-        :param tags: job tags
-        :param id: job id. Generated if not supplied
-        :return: Response object
+     * Implements the low level command call, this needs to build the command
+     * structure and push it on the correct queue. :param command: Command name
+     * to execute supported by the node (ex: core.system, info.cpu, etc...)
+     * check documentation for list of built in commands :param arguments: A
+     * dict of required command arguments depends on the command name. :param
+     * queue: command queue (commands on the same queue are executed
+     * sequentially) :param max_time: kill job server side if it exceeded this
+     * amount of seconds :param stream: If True, process stdout and stderr are
+     * pushed to a special queue (stream:<id>) so client can stream output
+     * :param tags: job tags :param id: job id. Generated if not supplied
+     * :return: Response object
      */
     @Override
-    public Response raw(String command, HashMap<String,String> arguments, String queue, boolean stream, long max_time, String id, String... tags) {
-        if(id == null) {
+    public Response raw(String command, HashMap<String, String> arguments, String queue, boolean stream, long max_time, String id, String... tags) {
+        if (id == null) {
             id = "TODO generate";
         }
-        
+
         EJSONObject payload = new EJSONObject();
         payload.putString("id", id);
         payload.putString("queue", queue);
         payload.putLong("max_time", max_time);
         payload.putBoolean("stream", stream);
-        
+
         EJSONArray tagsa = new EJSONArray();
         for (String tag : tags) {
             tagsa.addString(tag);
         }
         payload.putArray("tags", tagsa);
-        
+
         EJSONObject args = new EJSONObject();
-        for (Map.Entry<String, String> entry : arguments.entrySet()) {
-            String key = entry.getKey();
-            String value = entry.getValue();
-            args.putString(key, value);
+        if (arguments != null) {
+            for (Map.Entry<String, String> entry : arguments.entrySet()) {
+                String key = entry.getKey();
+                String value = entry.getValue();
+                args.putString(key, value);
+            }
         }
         payload.putObject("arguments", args);
-        
-        String flag = "result:"+id+":flag";
+
+        String flag = "result:" + id + ":flag";
         jedis.rpush("core:default", payload.toJSONString());
-        
+
         String brpoplpush = jedis.brpoplpush(flag, flag, 10);
-        if(brpoplpush == null || brpoplpush.equals("")) {
+        if (brpoplpush == null || brpoplpush.equals("")) {
             // TODO log timeout in submit
             return null;
         }
-        
+
         Response r = new Response(jedis, id);
         return r;
     }
-    
-    
-    
+
 }

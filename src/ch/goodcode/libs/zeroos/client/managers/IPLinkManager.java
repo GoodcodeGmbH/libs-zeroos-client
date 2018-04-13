@@ -12,7 +12,7 @@ import redis.clients.jedis.Jedis;
  *
  * @author Paolo Domenighetti
  */
-public class IPLinkManager extends AbstractJedisWrap {
+public class IPLinkManager extends AbstractClientWrap {
 
     public IPLinkManager(LogBuffer log, Jedis jedis) {
         super(log, jedis);

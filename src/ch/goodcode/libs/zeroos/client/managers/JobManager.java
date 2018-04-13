@@ -12,7 +12,7 @@ import redis.clients.jedis.Jedis;
  *
  * @author Paolo Domenighetti
  */
-public class JobManager extends AbstractJedisWrap {
+public class JobManager extends AbstractClientWrap {
 
     public JobManager(LogBuffer log, Jedis jedis) {
         super(log, jedis);

@@ -12,7 +12,7 @@ import redis.clients.jedis.Jedis;
  *
  * @author Paolo Domenighetti
  */
-public class BtrfsManager extends AbstractJedisWrap {
+public class BtrfsManager extends AbstractClientWrap {
 
     public BtrfsManager(LogBuffer log, Jedis jedis) {
         super(log, jedis);

@@ -6,22 +6,20 @@
 package ch.goodcode.libs.zeroos.client.managers;
 
 import ch.goodcode.libs.logging.LogBuffer;
-import redis.clients.jedis.Jedis;
+import ch.goodcode.libs.zeroos.client.ZeroOSClient;
 
 /**
  *
  * @author Paolo Domenighetti
  */
-public abstract class AbstractJedisWrap {
+public abstract class AbstractClientWrap {
     
     protected final LogBuffer log;
-    protected final Jedis jedis;
+    protected final ZeroOSClient backref;
 
-    public AbstractJedisWrap(LogBuffer log, Jedis jedis) {
+    public AbstractClientWrap(LogBuffer log, ZeroOSClient backref) {
         this.log = log;
-        this.jedis = jedis;
+        this.backref = backref;
     }
-
-    
     
 }

@@ -12,7 +12,7 @@ import redis.clients.jedis.Jedis;
  *
  * @author Paolo Domenighetti
  */
-public class ProcessManager extends AbstractJedisWrap {
+public class ProcessManager extends AbstractClientWrap {
 
     public ProcessManager(LogBuffer log, Jedis jedis) {
         super(log, jedis);

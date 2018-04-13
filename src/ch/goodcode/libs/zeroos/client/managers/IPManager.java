@@ -12,7 +12,7 @@ import redis.clients.jedis.Jedis;
  *
  * @author Paolo Domenighetti
  */
-public class IPManager extends AbstractJedisWrap {
+public class IPManager extends AbstractClientWrap {
     
 
     public final IPBridgeManager bridge;

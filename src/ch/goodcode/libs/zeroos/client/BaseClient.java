@@ -77,7 +77,16 @@ abstract class BaseClient {
      * @param id
      * @param tags
      */
-    public void json(String command, HashMap<String, String> arguments, String id, String... tags) {
+    public String json(String command, HashMap<String, String> arguments, String id, String... tags) {
+
+    }
+    
+    /**
+     * 
+     * @param command
+     * @param arguments 
+     */
+    public String json(String command, HashMap<String, String> arguments) {
 
     }
 

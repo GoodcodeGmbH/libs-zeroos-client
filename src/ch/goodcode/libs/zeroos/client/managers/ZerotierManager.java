@@ -12,7 +12,7 @@ import redis.clients.jedis.Jedis;
  *
  * @author Paolo Domenighetti
  */
-public class ZerotierManager extends AbstractJedisWrap {
+public class ZerotierManager extends AbstractClientWrap {
 
     public ZerotierManager(LogBuffer log, Jedis jedis) {
         super(log, jedis);

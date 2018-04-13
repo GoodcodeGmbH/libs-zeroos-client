@@ -12,7 +12,7 @@ import redis.clients.jedis.Jedis;
  *
  * @author Paolo Domenighetti
  */
-public class DiskManager extends AbstractJedisWrap {
+public class DiskManager extends AbstractClientWrap {
 
     public DiskManager(LogBuffer log, Jedis jedis) {
         super(log, jedis);
