@@ -6,6 +6,8 @@
 package ch.goodcode.libs.zeroos.client.model;
 
 import ch.goodcode.libs.zeroos.client.JythonController;
+import ch.goodcode.libs.zeroos.client.PythonClientException;
+import ch.goodcode.libs.zeroos.client.ZeroOSException;
 import ch.goodcode.libs.zeroos.client.managers.InfoManager;
 import ch.goodcode.libs.zeroos.client.managers.ProcessManager;
 
@@ -22,13 +24,13 @@ public class Container {
     private final JythonController PY;
     private final String VARNAME;
 
-    public Container(String id, JythonController PY) {
+    public Container(String id, JythonController PY) throws PythonClientException, ZeroOSException {
         this.id = id;
         this.PY = PY;
         this.VARNAME = "container_"+id;
         this.info = new InfoManager(PY, VARNAME);
         this.process = new ProcessManager(PY, VARNAME);
-        PY.rawAssign(VARNAME, "cl.container.client('"+id+"')");
+        this.PY.rawAssign(VARNAME, "cl.container.client('"+id+"')");
     }
 
     /**
@@ -36,8 +38,8 @@ public class Container {
      * @param linuxCommand
      * @return 
      */
-    public String system(String linuxCommand) {
-        return PY.processOnVar(VARNAME, "system('"+linuxCommand+"').get()");
+    public String system(String linuxCommand) throws PythonClientException, ZeroOSException {
+        return PY.processOnVar(VARNAME, "system('"+linuxCommand+"').get(60)");
     }
     
 }

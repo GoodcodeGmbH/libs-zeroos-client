@@ -6,6 +6,7 @@
 package ch.goodcode.libs.zeroos.client.managers;
 
 import ch.goodcode.libs.zeroos.client.JythonController;
+import ch.goodcode.libs.zeroos.client.PythonClientException;
 
 /**
  *
@@ -17,12 +18,21 @@ public class ProcessManager extends AbstractManager {
         super(PY, TARGET_ENTITY_VARNAME);
     }
  
-    public String list() {
+    /**
+     * 
+     * @return 
+     */
+    public String list() throws PythonClientException {
         PY.rawAssign("lista", TARGET_ENTITY_VARNAME+".process.list()");
         return PY.rawGet("lista");
     }
     
-    public String kill(String pid) {
+    /**
+     * Do not kill 0-core!
+     * @param pid
+     * @return 
+     */
+    public String kill(String pid) throws PythonClientException {
         PY.rawAssign("res", TARGET_ENTITY_VARNAME+".process.kill('"+pid+"')");
         return PY.rawGet("res");
     }

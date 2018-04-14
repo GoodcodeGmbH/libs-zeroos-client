@@ -25,25 +25,25 @@ public class JythonController {
         timeout = 100;
     }
 
-    public void initialize() {
+    public void initialize() throws PythonClientException {
         PYTHON.exec("from zeroos.core0.client import Client");
         PYTHON.exec("cl = Client(host='" + zeroCoreHostAddr + "', password='" + password + "')");
         PYTHON.exec("cl.ping()");
         PYTHON.exec("cl.timeout = " + timeout);
     }
 
-    public String rawGet(String var) {
+    public String rawGet(String var) throws PythonClientException {
         PyObject x = PYTHON.get(var);
         return x.asString();
     }
 
-    public String process(String appendedPythonExecCommand) {
+    public String process(String appendedPythonExecCommand) throws PythonClientException {
         PYTHON.exec("x = cl." + appendedPythonExecCommand);
         PyObject x = PYTHON.get("x");
         return x.asString();
     }
 
-    public String process(String appendedPythonExecCommand, String... execs) {
+    public String process(String appendedPythonExecCommand, String... execs) throws PythonClientException {
         for (String exec : execs) {
             PYTHON.exec(exec);
         }
@@ -52,13 +52,13 @@ public class JythonController {
         return x.asString();
     }
 
-    public String processOnVar(String var, String appendedPythonExecCommand) {
+    public String processOnVar(String var, String appendedPythonExecCommand) throws PythonClientException {
         PYTHON.exec("y = " + var + "." + appendedPythonExecCommand);
         PyObject x = PYTHON.get("y");
         return x.asString();
     }
 
-    public String processOnVar(String var, String appendedPythonExecCommand, String... execs) {
+    public String processOnVar(String var, String appendedPythonExecCommand, String... execs) throws PythonClientException {
         for (String exec : execs) {
             PYTHON.exec(exec);
         }
@@ -67,11 +67,11 @@ public class JythonController {
         return x.asString();
     }
 
-    public void rawAssign(String var, String expr) {
+    public void rawAssign(String var, String expr) throws PythonClientException {
         PYTHON.exec(var + " = " + expr);
     }
 
-    public void dispose() {
-
+    public void dispose() throws PythonClientException {
+        // only log
     }
 }

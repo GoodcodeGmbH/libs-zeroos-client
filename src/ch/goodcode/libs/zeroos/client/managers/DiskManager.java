@@ -6,6 +6,7 @@
 package ch.goodcode.libs.zeroos.client.managers;
 
 import ch.goodcode.libs.zeroos.client.JythonController;
+import ch.goodcode.libs.zeroos.client.PythonClientException;
 
 /**
  *
@@ -17,11 +18,13 @@ public class DiskManager extends AbstractManager {
         super(PY, TARGET_ENTITY_VARNAME);
     }
     
-    public String list() {
-        
+    public String mount(String devicename, String path) throws PythonClientException {
+        PY.rawAssign("res", TARGET_ENTITY_VARNAME+".disk.mount('"+devicename+"',"+path+"')");
+        return PY.rawGet("res");
     }
     
-    public String mount() {
-        
+    public String list() throws PythonClientException {
+        PY.rawAssign("res", TARGET_ENTITY_VARNAME+".disk.list()");
+        return PY.rawGet("res");
     }
 }

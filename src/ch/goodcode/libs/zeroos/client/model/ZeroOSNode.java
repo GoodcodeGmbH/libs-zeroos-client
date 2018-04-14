@@ -3,17 +3,16 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package ch.goodcode.libs.zeroos.client;
+package ch.goodcode.libs.zeroos.client.model;
 
 import ch.goodcode.libs.logging.LogBuffer;
+import ch.goodcode.libs.zeroos.client.JythonController;
+import ch.goodcode.libs.zeroos.client.PythonClientException;
+import ch.goodcode.libs.zeroos.client.ZeroOSException;
 import ch.goodcode.libs.zeroos.client.managers.BtrfsManager;
 import ch.goodcode.libs.zeroos.client.managers.DiskManager;
 import ch.goodcode.libs.zeroos.client.managers.FilesystemManager;
-import ch.goodcode.libs.zeroos.client.model.Container;
 import java.util.HashMap;
-import org.python.core.PyInteger;
-import org.python.core.PyObject;
-import org.python.util.PythonInterpreter;
 
 /**
  *
@@ -21,16 +20,34 @@ import org.python.util.PythonInterpreter;
  */
 public final class ZeroOSNode {
     
+    public static final String STATUS_ONLINE = "ONLINE";
+    public static final String STATUS_HEALTHY = "HEALTHY";
+    public static final String STATUS_UNKNOWN = "UNKNOWN";
+    public static final String STATUS_ERROR = "ERROR";
+    
     public final FilesystemManager filesystem;
     public final DiskManager disk;
     public final BtrfsManager btrfs;
     
     private final HashMap<String, Container> containers = new HashMap<>();
 
+    private final String UID;
     private final JythonController PY;
     private final LogBuffer LOG;
+    private String status;
 
-    public ZeroOSNode(LogBuffer log, String zeroCoreNodeAddr, String password) {
+    /**
+     * 
+     * @param uid
+     * @param log
+     * @param zeroCoreNodeAddr
+     * @param password 
+     */
+    public ZeroOSNode(String uid, LogBuffer log, String zeroCoreNodeAddr, String password) {
+       this.UID = uid;
+        if(log == null) {
+            log = new LogBuffer("autogen-"+this.getClass().getCanonicalName(), "C:\\temp", 0, 99);
+        }
         this.LOG = log;
         this.PY = new JythonController(zeroCoreNodeAddr, password);
         this.filesystem = new FilesystemManager(PY, "cl");
@@ -38,12 +55,14 @@ public final class ZeroOSNode {
         this.btrfs = new BtrfsManager(PY, "cl");
     }
 
-    public void start() {
-
+    public void prepare() throws PythonClientException, ZeroOSException {
+        // TODO ...
+        this.PY.initialize();
     }
     
-    public void stop() {
-
+    public void cleanup() throws PythonClientException, ZeroOSException {
+        this.PY.dispose();
+        // TODO ...
     }
 
     // ====================================================================================================================
@@ -53,11 +72,12 @@ public final class ZeroOSNode {
     /**
      * 
      * @param flist a gig official flist with .flist extension
-     * @param nicZerotierId id
-     * @param storage ardb://hub.gig.tech:16379
-     * @return 
+     * @param nicZerotierId id of the nic adapter
+     * @param storage eg. ardb://hub.gig.tech:16379
+     * @return the ID of the newly created 
+     * @throws ch.goodcode.libs.zeroos.client.ZeroOSException 
      */
-    public String createDefaultContainer(String flist, String nicZerotierId, String storage) {
+    public String createDefaultContainer(String flist, String nicZerotierId, String storage) throws ZeroOSException, PythonClientException {
         PY.rawAssign("nic", "[{'type':'default'}, {'type': 'zerotier', 'id': '"+nicZerotierId+"'}]");
         PY.rawAssign("cid", "cl.container.create('https://hub.gig.tech/gig-official-apps/"+flist+"', nics=nic, storage='"+storage+"').get(60)");
         return PY.rawGet("cid");
@@ -66,9 +86,9 @@ public final class ZeroOSNode {
     /**
      * 
      * @param id
-     * @return 
+     * @return the container with given ID or null if no container with such ID exists
      */
-    public Container getContainer(String id) {
+    public Container getContainer(String id) throws ZeroOSException, PythonClientException {
         if(!containers.containsKey(id)) {
             containers.put(id, new Container(id, PY));
         }
@@ -78,28 +98,13 @@ public final class ZeroOSNode {
 
     // ====================================================================================================================
     // ====================================================================================================================
-    public static void main(String[] args) {
-        //test1();
+
+    public String getStatus() {
+        return status;
     }
 
-    private static void test1() {
-        PythonInterpreter interp = new PythonInterpreter();
-        interp.exec("import sys");
-        interp.exec("print sys");
-        interp.set("a", new PyInteger(42));
-        interp.exec("print a");
-        interp.exec("x = 2+2");
-        PyObject x = interp.get("x");
-        System.out.println("x: " + x);
+    public void setStatus(String status) {
+        this.status = status;
     }
-
-    private static void test2() {
-        LogBuffer log = new LogBuffer("test-log", "C:\\temp", 0, 99);
-        ZeroOSNode o = new ZeroOSNode(log, "", "");
-        o.start();
-
-        
-        
-        o.stop();
-    }
+  
 }

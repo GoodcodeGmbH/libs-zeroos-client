@@ -6,6 +6,7 @@
 package ch.goodcode.libs.zeroos.client.managers;
 
 import ch.goodcode.libs.zeroos.client.JythonController;
+import ch.goodcode.libs.zeroos.client.PythonClientException;
 
 /**
  *
@@ -17,7 +18,7 @@ public class FilesystemManager extends AbstractManager {
         super(PY, TARGET_ENTITY_VARNAME);
     }
     
-    public String list(String path) {
+    public String list(String path) throws PythonClientException {
         if(path == null) {
             path = "/";
         }
@@ -25,12 +26,12 @@ public class FilesystemManager extends AbstractManager {
         return PY.rawGet("res");
     }
     
-    public String mkdir(String path) {
+    public String mkdir(String path) throws PythonClientException {
         PY.rawAssign("res", TARGET_ENTITY_VARNAME+".filesystem.mkdir('"+path+"')");
         return PY.rawGet("res");
     }
     
-    public String upload_file(String remotePath, String myPath) {
+    public String upload_file(String remotePath, String myPath) throws PythonClientException {
         PY.rawAssign("res", TARGET_ENTITY_VARNAME+".filesystem.upload_file('"+remotePath+"','"+myPath+"')");
         return PY.rawGet("res");
     }

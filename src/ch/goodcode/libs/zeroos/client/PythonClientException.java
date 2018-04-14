@@ -9,6 +9,6 @@ package ch.goodcode.libs.zeroos.client;
  *
  * @author Paolo Domenighetti
  */
-public class ZeroOSClientException extends Exception {
+public class PythonClientException extends Exception {
     
 }

@@ -6,6 +6,7 @@
 package ch.goodcode.libs.zeroos.client.managers;
 
 import ch.goodcode.libs.zeroos.client.JythonController;
+import ch.goodcode.libs.zeroos.client.PythonClientException;
 
 /**
  *
@@ -17,39 +18,39 @@ public class InfoManager extends AbstractManager {
         super(PY, ENTITY_VARNAME);
     }
     
-    public String nic() {
-        PY.rawAssign("info", TARGET_ENTITY_VARNAME+".info.nic()");
-        return PY.rawGet("info");
+    public String nic() throws PythonClientException {
+        PY.rawAssign("z", TARGET_ENTITY_VARNAME+".info.nic()");
+        return PY.rawGet("z");
     }
     
-    public String cpu() {
-        PY.rawAssign("info", TARGET_ENTITY_VARNAME+".info.cpu()");
-        return PY.rawGet("info");
+    public String cpu() throws PythonClientException {
+        PY.rawAssign("z", TARGET_ENTITY_VARNAME+".info.cpu()");
+        return PY.rawGet("z");
     }
     
-    public String mem() {
-        PY.rawAssign("info", TARGET_ENTITY_VARNAME+".info.mem()");
-        return PY.rawGet("info");
+    public String mem() throws PythonClientException {
+        PY.rawAssign("z", TARGET_ENTITY_VARNAME+".info.mem()");
+        return PY.rawGet("z");
     }
     
-    public String disk() {
-        PY.rawAssign("info", TARGET_ENTITY_VARNAME+".info.disk()");
-        return PY.rawGet("info");
+    public String disk() throws PythonClientException {
+        PY.rawAssign("z", TARGET_ENTITY_VARNAME+".info.disk()");
+        return PY.rawGet("z");
     }
     
-    public String os() {
-        PY.rawAssign("info", TARGET_ENTITY_VARNAME+".info.os()");
-        return PY.rawGet("info");
+    public String os() throws PythonClientException {
+        PY.rawAssign("z", TARGET_ENTITY_VARNAME+".info.os()");
+        return PY.rawGet("z");
     }
     
-    public String port() {
-        PY.rawAssign("info", TARGET_ENTITY_VARNAME+".info.port()");
-        return PY.rawGet("info");
+    public String port() throws PythonClientException {
+        PY.rawAssign("z", TARGET_ENTITY_VARNAME+".info.port()");
+        return PY.rawGet("z");
     }
     
-    public String version() {
-        PY.rawAssign("info", TARGET_ENTITY_VARNAME+".info.version()");
-        return PY.rawGet("info");
+    public String version() throws PythonClientException {
+        PY.rawAssign("z", TARGET_ENTITY_VARNAME+".info.version()");
+        return PY.rawGet("z");
     }
     
 }
