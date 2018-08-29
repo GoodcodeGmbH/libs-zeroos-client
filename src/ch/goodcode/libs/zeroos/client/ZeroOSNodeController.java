@@ -18,10 +18,14 @@ public class ZeroOSNodeController implements Runnable {
     
     private boolean on = true;
     private final LogBuffer LOG;
+    private final int POLL_EVERY_SECONDS;
 
-    public ZeroOSNodeController(LogBuffer LOG) {
+    public ZeroOSNodeController(LogBuffer LOG, int POLL_EVERY_SECONDS) {
         this.LOG = LOG;
+        this.POLL_EVERY_SECONDS = POLL_EVERY_SECONDS;
     }
+
+    
     
     /*
     
