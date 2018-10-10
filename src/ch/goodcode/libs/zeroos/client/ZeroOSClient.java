@@ -10,10 +10,8 @@ package ch.goodcode.libs.zeroos.client;
  * @author Paolo Domenighetti
  */
 public class ZeroOSClient {
-    
-    public void connect() {
-        
+
+    public static void main(String[] args) {
+
     }
-    
-    
 }

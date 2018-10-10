@@ -11,7 +11,7 @@ import com.flexworks.persistency.IHibernable;
  *
  * @author Paolo Domenighetti
  */
-public class NodesTopology implements IHibernable {
+public class ContainerDescr implements IHibernable {
 
     @Override
     public int dbid() {

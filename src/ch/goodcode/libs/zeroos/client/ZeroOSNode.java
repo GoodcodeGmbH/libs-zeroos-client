@@ -3,12 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package ch.goodcode.libs.zeroos.client.model;
+package ch.goodcode.libs.zeroos.client;
 
 import ch.goodcode.libs.logging.LogBuffer;
-import ch.goodcode.libs.zeroos.client.JythonController;
-import ch.goodcode.libs.zeroos.client.PythonClientException;
-import ch.goodcode.libs.zeroos.client.ZeroOSException;
 import ch.goodcode.libs.zeroos.client.managers.BtrfsManager;
 import ch.goodcode.libs.zeroos.client.managers.DiskManager;
 import ch.goodcode.libs.zeroos.client.managers.FilesystemManager;
@@ -76,6 +73,7 @@ public final class ZeroOSNode {
      * @param storage eg. ardb://hub.gig.tech:16379
      * @return the ID of the newly created 
      * @throws ch.goodcode.libs.zeroos.client.ZeroOSException 
+     * @throws ch.goodcode.libs.zeroos.client.PythonClientException 
      */
     public String createDefaultContainer(String flist, String nicZerotierId, String storage) throws ZeroOSException, PythonClientException {
         PY.rawAssign("nic", "[{'type':'default'}, {'type': 'zerotier', 'id': '"+nicZerotierId+"'}]");
@@ -87,6 +85,8 @@ public final class ZeroOSNode {
      * 
      * @param id
      * @return the container with given ID or null if no container with such ID exists
+     * @throws ch.goodcode.libs.zeroos.client.ZeroOSException
+     * @throws ch.goodcode.libs.zeroos.client.PythonClientException
      */
     public Container getContainer(String id) throws ZeroOSException, PythonClientException {
         if(!containers.containsKey(id)) {

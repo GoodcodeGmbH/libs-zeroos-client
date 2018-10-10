@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package ch.goodcode.libs.zeroos.client.model;
+package ch.goodcode.libs.zeroos.client;
 
 import ch.goodcode.libs.zeroos.client.JythonController;
 import ch.goodcode.libs.zeroos.client.PythonClientException;
